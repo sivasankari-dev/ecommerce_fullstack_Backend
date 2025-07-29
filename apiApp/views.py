@@ -5,7 +5,7 @@ from django.db.models import Q
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from .models import Product, Category, Cart, CartItem, Review, Wishlist
-from .serializers import ProductListSerializer, ProductDetailSerializer, CategoryListSerializer, CategoryDetailSerializer, CartSerializer, CartItemSerializer, ReviewSerializer, WishlistSerializer
+from .serializers import ProductListSerializer, ProductDetailSerializer, CategoryListSerializer, CategoryDetailSerializer, CartSerializer, CartItemSerializer, ReviewSerializer, WishlistSerializer, CartStatSerializer,SimpleCartSerializer
 
 User = get_user_model()
 
@@ -34,6 +34,26 @@ def category_detail(request, slug):
     serializer = CategoryDetailSerializer(category)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def get_cart(request, cart_code):
+    cart = Cart.objects.filter(cart_code=cart_code).first()
+    
+    if cart:
+        serializer = CartSerializer(cart)
+        return Response(serializer.data)
+    
+    return Response({"error": "Cart not found."}, status=404)
+
+@api_view(['GET'])
+def get_cart_stat(request):
+    cart_code = request.query_params.get("cart_code")
+    cart = Cart.objects.filter(cart_code=cart_code).first()
+
+    if cart:
+        serializer = SimpleCartSerializer(cart)
+        return Response(serializer.data)
+    return Response({"error": "Cart not found."}, status=status.HTTP_404_NOT_FOUND)
+
 @api_view(["POST"])
 def add_to_cart(request):
     cart_code = request.data.get("cart_code")
@@ -48,6 +68,17 @@ def add_to_cart(request):
 
     serializer = CartSerializer(cart)
     return Response(serializer.data)
+
+@api_view(["GET"])
+def product_in_cart(request):
+    cart_code = request.query_params.get("cart_code")
+    product_id = request.query_params.get("product_id")
+
+    cart = Cart.objects.get(cart_code = cart_code)
+    product = Product.objects.get(id = product_id)
+
+    product_exists_in_cart = CartItem.objects.filter(cart=cart,product=product).exists()
+    return Response({'product_in_cart':product_exists_in_cart})
 
 
 @api_view(["PUT"])

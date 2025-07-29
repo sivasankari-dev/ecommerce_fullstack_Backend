@@ -9,9 +9,15 @@ class ProductListSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "slug", "image", "price"]
 
 class ProductDetailSerializer(serializers.ModelSerializer):
+    similar_products = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ["id", "name", "description", "slug", "image",  "price", "category"]
+        fields = ["id", "name", "description", "slug", "image",  "price", "category", "similar_products"]
+
+    def get_similar_products(self, product):
+         products = Product.objects.filter(category=product.category).exclude(id=product.id)
+         serializer = ProductListSerializer(products, many=True)
+         return serializer.data   
 
 class CategoryListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,6 +54,16 @@ class CartSerializer(serializers.ModelSerializer):
         total = sum([item.quantity * item.product.price for item in items])
         return total
 
+class SimpleCartSerializer(serializers.ModelSerializer):
+    num_of_items = serializers.SerializerMethodField()
+    class Meta:
+        model = Cart 
+        fields = ["id", "cart_code", "num_of_items"]
+
+    def get_num_of_items(self, cart):
+        num_of_items = sum([item.quantity for item in cart.cartitems.all()])
+        return num_of_items
+
 class CartStatSerializer(serializers.ModelSerializer):
     total_quantity = serializers.SerializerMethodField()
     class Meta:
@@ -57,6 +73,7 @@ class CartStatSerializer(serializers.ModelSerializer):
     def get_total_quantity(self,cart):
         items = cart.cartitems.all()
         total_quantity = sum([item.quantity for item in items])
+        return total_quantity
 
 
 class UserSerializer(serializers.ModelSerializer):
