@@ -23,9 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-03gh#36-(e$duc4yjwg94f28hi4609ncg9d24(nhh*8ksyxbfw'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Turning debug to false for deployment
+DEBUG = False 
 
-ALLOWED_HOSTS = []
+# Added allowed hosts for deployment
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com"]
 
 
 # Application definition
@@ -59,6 +61,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
     "http://localhost:5173"
+    "https://shoppro.vercel.app"
 ]
 
 ROOT_URLCONF = 'ecommerceAPIproject.urls'
@@ -127,6 +130,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+# Adding static root for deployment
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Setting media URL for storing images
 MEDIA_URL = 'media/'
