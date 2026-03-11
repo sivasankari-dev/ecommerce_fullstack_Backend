@@ -3,7 +3,7 @@ import django
 from django.contrib.auth import get_user_model
 
 # REPLACE 'your_project_name' with the folder containing settings.py
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project_name.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ecommerceAPIproject.settings')
 django.setup()
 
 def create_admin():
