@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-03gh#36-(e$duc4yjwg94f28hi4609ncg9d24(nhh*8ksyxbfw
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Turning debug to false for deployment
-DEBUG = False 
+DEBUG = False
 
 # Added allowed hosts for deployment
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com"]
@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
 
 # Adding the app name and rest framework
     'apiApp', 
@@ -90,16 +92,23 @@ WSGI_APPLICATION = 'ecommerceAPIproject.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
- #  'default': {
- #       'ENGINE': 'django.db.backends.sqlite3',
- #      'NAME': BASE_DIR / 'db.sqlite3',
+#   'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#       'NAME': BASE_DIR / 'db.sqlite3',
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
         conn_max_age=600,
         ssl_require=True
     )
-    
 }
+    
+# }
+
+# # Only apply SSL if we are NOT using SQLite
+# if DATABASES['default']['ENGINE'] != 'django.db.backends.sqlite3':
+#     DATABASES['default']['OPTIONS'] = {
+#         'sslmode': 'require',
+#     }
 
 
 # Password validation
@@ -142,6 +151,16 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # This enables compression and caching for better performance
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Cloudinary Configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+# Tell Django to use Cloudinary for Media files
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Setting media URL for storing images
 MEDIA_URL = 'media/'
